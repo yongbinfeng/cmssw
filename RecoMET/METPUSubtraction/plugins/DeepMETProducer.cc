@@ -119,7 +119,7 @@ void DeepMETProducer::produce(edm::Event& event, const edm::EventSetup& setup) {
   px -= px_leptons;
   py -= py_leptons;
 
-  std::cout << "DeepMET px, py: " << px << ", " << py << std::endl;
+  //std::cout << "DeepMET px, py: " << px << ", " << py << std::endl;
 
   auto pf_mets = std::make_unique<pat::METCollection>();
   reco::LeafCandidate::LorentzVector p4(px, py, 0., std::sqrt(px*px + py*py));
@@ -134,6 +134,7 @@ std::unique_ptr<DeepMETCache> DeepMETProducer::initializeGlobalCache(const edm::
 
   // load the graph def and save it
   std::string graphPath = params.getParameter<std::string>("graph_path");
+  std::cout << "graph path "<< graphPath << std::endl;
   if (!graphPath.empty()) {
     graphPath = edm::FileInPath(graphPath).fullPath();
     cache->graph_def = tensorflow::loadGraphDef(graphPath);
@@ -151,7 +152,7 @@ void DeepMETProducer::fillDescriptions(edm::ConfigurationDescriptions& descripti
   desc.add<edm::InputTag>("pf_src", edm::InputTag("packedPFCandidates"));
   desc.add<bool>("ignore_leptons", false);
   desc.add<double>("norm_factor", 50.);
-  desc.add<std::string>("graph_path", "RecoMET/METPUSubtraction/data/tf_models/deepmet_v0.pb");
+  desc.add<std::string>("graph_path", "RecoMET/METPUSubtraction/data/tf_models/deepmet_2018.pb");
   descriptions.add("deepMETProducer", desc);
 }
 
