@@ -67,7 +67,8 @@ DeepMETProducer::DeepMETProducer(const edm::ParameterSet& cfg, const DeepMETCach
 }
 
 void DeepMETProducer::produce(edm::Event& event, const edm::EventSetup& setup) {
-  auto const& pfs = event.get(pf_token_);
+  edm::Handle<std::vector<pat::PackedCandidate> > pf_h;
+  event.getByToken(pf_token_, pf_h);
 
   const tensorflow::NamedTensorList input_list = {
       {"input", input_}, {"input_cat0", input_cat0_}, {"input_cat1", input_cat1_}, {"input_cat2", input_cat2_}};
@@ -82,7 +83,7 @@ void DeepMETProducer::produce(edm::Event& event, const edm::EventSetup& setup) {
   float px_leptons = 0.;
   float py_leptons = 0.;
   const float scale = 1. / norm_;
-  for (const auto& pf : pfs) {
+  for (const auto& pf : *pf_h) {
     if (ignore_leptons_) {
       int pdg_id = std::abs(pf.pdgId());
       if (pdg_id == 11 || pdg_id == 13) {
