@@ -468,8 +468,13 @@ for modifier in run2_egamma_2017,run2_egamma_2018,run2_nanoAOD_94XMiniAODv1,run2
 )
 
 run2_nanoAOD_LowPU.toModify(electronTable.variables,
+    # variable used to compare with the SMP-20-004 corrections (this should be the same as SMP-20-004)
     ecalCorr = Var("userFloat('ecalEnergyPostCorrNew')/userFloat('ecalEnergyPreCorrNew')",float, doc="ratio of the calibrated ecal energy / miniaod ecal energy"),
+    # pf isolation, pfRelIso03_all is calcuated with respect to the uncorrected electron pt (default in MiniAOD)
     pfIso03_all = Var("userFloat('PFIsoAll')",float,doc="PF isolation dR=0.3, total (with rho*EA PU corrections)"),
+    # pt uncertainty (should be able to be calculated from energyErr, save here just for fast processing)
+    # pt_old * Enew/Eold * deltaE/Enew = pt_old * deltaE/Eold
+    ptErr = Var("pt*userFloat('ecalTrkEnergyErrPostCorrNew')/userFloat('ecalTrkEnergyPreCorrNew')",float, doc="pt error of the cluster-track combination"),
 )
 
 # scale and smearing only when available
