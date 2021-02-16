@@ -32,9 +32,9 @@ rawMetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
     singleton = cms.bool(True),  # there's always exactly one MET per event
     extension = cms.bool(False), # this is the main table for the MET
     variables = cms.PSet(#NOTA BENE: we don't copy PTVars here!
-       pt  = Var("uncorPt",  float, doc="pt", precision=10),
-       phi = Var("uncorPhi", float, doc="phi", precision=10),
-       sumEt = Var("uncorSumEt", float, doc="scalar sum of Et", precision=10),
+       pt  = Var("uncorPt",  float, doc="pt"),
+       phi = Var("uncorPhi", float, doc="phi"),
+       sumEt = Var("uncorSumEt", float, doc="scalar sum of Et"),
     ),
 )
 
@@ -82,9 +82,9 @@ rawPuppiMetTable = cms.EDProducer("SimpleCandidateFlatTableProducer",
     singleton = cms.bool(True),  # there's always exactly one MET per event
     extension = cms.bool(False), # this is the main table for the MET
     variables = cms.PSet(#NOTA BENE: we don't copy PTVars here!
-       pt  = Var("uncorPt",  float, doc="pt", precision=10),
-       phi = Var("uncorPhi", float, doc="phi", precision=10),
-       sumEt = Var("uncorSumEt", float, doc="scalar sum of Et", precision=10),
+       pt  = Var("uncorPt",  float, doc="pt"),
+       phi = Var("uncorPhi", float, doc="phi"),
+       sumEt = Var("uncorSumEt", float, doc="scalar sum of Et"),
     ),)
 
 
