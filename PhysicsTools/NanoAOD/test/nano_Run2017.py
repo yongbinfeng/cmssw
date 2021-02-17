@@ -11,6 +11,7 @@ import re
 from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
 from Configuration.Eras.Modifier_run2_nanoAOD_LowPU_cff import run2_nanoAOD_LowPU
 
+#process = cms.Process('NANO',Run2_2017, run2_nanoAOD_LowPU)
 process = cms.Process('NANO',run2_nanoAOD_LowPU)
 
 opt = VarParsing.VarParsing('analysis')
@@ -30,7 +31,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(20000)
+    input = cms.untracked.int32(200)
 )
 
 # Input source
@@ -38,8 +39,9 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         # test data
         #'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/00405246-A939-E811-A3F3-801844DEEC30.root'
+        'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/SingleMuon_H.root'
         # test MC
-        'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/02036C45-98AC-E911-8DEC-1866DAEA79D0.root'
+        #'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/02036C45-98AC-E911-8DEC-1866DAEA79D0.root'
     ),
     secondaryFileNames = cms.untracked.vstring()
 )
@@ -81,7 +83,7 @@ process.NANOAODoutput = cms.OutputModule("NanoAODOutputModule",
         dataTier = cms.untracked.string(datatier),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('NanoAOD.root'),
+    fileName = cms.untracked.string('NanoAOD_MC.root' if opt.isMC else 'NanoAOD_Data.root'),
     outputCommands = eventcontent.outputCommands
 )
 
