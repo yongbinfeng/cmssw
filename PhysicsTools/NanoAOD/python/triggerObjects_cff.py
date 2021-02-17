@@ -229,7 +229,7 @@ selections_lowPU = cms.VPSet(
         #l2seed = cms.string("type(92) && coll('')"),  l2deltaR = cms.double(0.5),
         skipObjectsNotPassingQualityBits = cms.bool(True),
         # change electron trigger bits for lowPU
-        qualityBits = cms.string("filter('hltEle20WPLoose1GsfTrackIsoFilter') + 2*filter('hltEle17WPLoose1GsfTrackIsoFilterForHI')"),
+        qualityBits = cms.string("filter('hltEle20WPLoose1GsfTrackIsoFilter*') + 2*filter('hltEle17WPLoose1GsfTrackIsoFilterForHI')"),
         qualityBitsDoc = cms.string('1 = Ele20, 2 = Ele17HI'),
     ),
     cms.PSet(

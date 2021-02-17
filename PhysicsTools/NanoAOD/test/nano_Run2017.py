@@ -16,6 +16,7 @@ process = cms.Process('NANO',run2_nanoAOD_LowPU)
 
 opt = VarParsing.VarParsing('analysis')
 opt.register('isMC', -1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, 'Flag indicating if the input samples are from MC (1) or from the detector (0).')
+opt.register('filterTrig', 1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, 'Flag indiciating to apply the trigger filter or not. Default is 1.')
 opt.parseArguments()
 
 
@@ -38,8 +39,8 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         # test data
-        #'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/00405246-A939-E811-A3F3-801844DEEC30.root'
-        'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/SingleMuon_H.root'
+        'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/00405246-A939-E811-A3F3-801844DEEC30.root'
+        #'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/SingleMuon_H.root'
         # test MC
         #'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/02036C45-98AC-E911-8DEC-1866DAEA79D0.root'
     ),
@@ -72,9 +73,11 @@ process.configurationMetadata = cms.untracked.PSet(
 if opt.isMC:
     datatier = 'NANOAODSIM'
     eventcontent = process.NANOAODSIMEventContent
+    outputname = "NanoAOD_MC.root"
 else:
     datatier = 'NANOAOD'
     eventcontent = process.NANOAODEventContent
+    outputname = "NanoAOD_Data.root"
 
 process.NANOAODoutput = cms.OutputModule("NanoAODOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
@@ -83,8 +86,11 @@ process.NANOAODoutput = cms.OutputModule("NanoAODOutputModule",
         dataTier = cms.untracked.string(datatier),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('NanoAOD_MC.root' if opt.isMC else 'NanoAOD_Data.root'),
-    outputCommands = eventcontent.outputCommands
+    fileName = cms.untracked.string(outputname),
+    outputCommands = eventcontent.outputCommands,
+    SelectEvents = cms.untracked.PSet(
+        SelectEvents = cms.vstring('nanoAOD_step')
+    )
 )
 
 # Additional output definition
@@ -95,8 +101,34 @@ print("global tag: ", globaltag)
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, globaltag, '')
 
+# add trigger requirement
+process.triggerStreamResultsFilter = cms.EDFilter('TriggerResultsFilter',
+    hltResults = cms.InputTag('TriggerResults', "", "HLT"),
+    l1tResults = cms.InputTag(''),                 # L1 uGT results - set to empty to ignore L1
+    throw = cms.bool(False),                       # throw exception on unknown trigger names
+    triggerConditions = cms.vstring(
+        # 13TeV data
+        'HLT_HIEle20_WPLoose_Gsf_v*',
+        # 13TeV MC
+        'HLT_Ele20_WPLoose_Gsf_v*'
+        # 5TeV data and MC
+        'HLT_HIEle17_WPLoose_Gsf_v*',
+        # 5 and 13 TeV data, 5TeV MC
+        'HLT_HIMu17_v*',
+        # 13TeV MC
+        'HLT_Mu17_v*',
+    )
+)
+# count number of events
+process.eventCountPre = cms.EDAnalyzer('EventCounter')
+process.eventCountPost = cms.EDAnalyzer('EventCounter')
+
+
 # Path and EndPath definitions
-process.nanoAOD_step = cms.Path(process.nanoSequence)
+if opt.filterTrig:
+    process.nanoAOD_step = cms.Path(process.eventCountPre * process.triggerStreamResultsFilter * process.nanoSequence * process.eventCountPost)
+else:
+    process.nanoAOD_step = cms.Path(process.eventCountPre * process.nanoSequence * process.eventCountPost)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.NANOAODoutput_step = cms.EndPath(process.NANOAODoutput)
 
@@ -111,6 +143,7 @@ process.options.numberOfStreams=cms.untracked.uint32(0)
 process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32(1)
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 5000
+process.MessageLogger.suppressWarning = cms.untracked.vstring('triggerStreamResultsFilter')
 
 # customisation of the process.
 
@@ -124,6 +157,7 @@ else:
 # End of customisation functions
 
 # Customisation from command line
+process.TFileService = cms.Service("TFileService", fileName = cms.string(outputname.replace(".root", "_Count.root")) )
 
 process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))
 # Add early deletion of temporary data products to reduce peak memory need
