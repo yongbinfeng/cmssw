@@ -74,10 +74,14 @@ if opt.isMC:
     datatier = 'NANOAODSIM'
     eventcontent = process.NANOAODSIMEventContent
     outputname = "NanoAOD_MC.root"
+    globaltag = "94X_mc2017_realistic_v14"
+    seq = process.nanoSequenceMC
 else:
     datatier = 'NANOAOD'
     eventcontent = process.NANOAODEventContent
     outputname = "NanoAOD_Data.root"
+    globaltag = "94X_dataRun2_ReReco_EOY17_v6"
+    seq = process.nanoSequence
 
 process.NANOAODoutput = cms.OutputModule("NanoAODOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
@@ -96,7 +100,6 @@ process.NANOAODoutput = cms.OutputModule("NanoAODOutputModule",
 # Additional output definition
 
 # Other statements
-globaltag = "94X_mc2017_realistic_v14" if opt.isMC else "94X_dataRun2_ReReco_EOY17_v6" 
 print("global tag: ", globaltag)
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, globaltag, '')
@@ -124,7 +127,6 @@ process.triggerStreamResultsFilter = cms.EDFilter('TriggerResultsFilter',
 #process.eventCountPost = cms.EDAnalyzer('EventCounter')
 
 # Path and EndPath definitions
-seq = process.nanoSequenceMC if opt.isMC else process.nanoSequence
 if opt.filterTrig:
     #process.nanoAOD_step = cms.Path(process.eventCountPre * process.triggerStreamResultsFilter * process.nanoSequence * process.eventCountPost)
     process.nanoAOD_step = cms.Path(process.triggerStreamResultsFilter * seq)
