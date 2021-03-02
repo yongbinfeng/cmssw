@@ -123,14 +123,14 @@ process.triggerStreamResultsFilter = cms.EDFilter('TriggerResultsFilter',
 #process.eventCountPre = cms.EDAnalyzer('EventCounter')
 #process.eventCountPost = cms.EDAnalyzer('EventCounter')
 
-
 # Path and EndPath definitions
+seq = process.nanoSequenceMC if opt.isMC else process.nanoSequence
 if opt.filterTrig:
     #process.nanoAOD_step = cms.Path(process.eventCountPre * process.triggerStreamResultsFilter * process.nanoSequence * process.eventCountPost)
-    process.nanoAOD_step = cms.Path(process.triggerStreamResultsFilter * process.nanoSequence)
+    process.nanoAOD_step = cms.Path(process.triggerStreamResultsFilter * seq)
 else:
     #process.nanoAOD_step = cms.Path(process.eventCountPre * process.nanoSequence * process.eventCountPost)
-    process.nanoAOD_step = cms.Path(process.nanoSequence)
+    process.nanoAOD_step = cms.Path(seq)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.NANOAODoutput_step = cms.EndPath(process.NANOAODoutput)
 
@@ -145,7 +145,7 @@ process.options.numberOfStreams=cms.untracked.uint32(0)
 process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32(1)
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 5000
-process.MessageLogger.suppressWarning = cms.untracked.vstring('triggerStreamResultsFilter')
+process.MessageLogger.suppressWarning = cms.untracked.vstring('triggerStreamResultsFilter', 'genJetAK8FlavourAssociation')
 
 # customisation of the process.
 
