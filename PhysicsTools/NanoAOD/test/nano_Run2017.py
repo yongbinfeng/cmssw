@@ -16,7 +16,7 @@ process = cms.Process('NANO',run2_nanoAOD_LowPU)
 
 opt = VarParsing.VarParsing('analysis')
 opt.register('isMC', -1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int, 'Flag indicating if the input samples are from MC (1) or from the detector (0).')
-opt.register('filterTrig', 1, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, 'Flag indiciating to apply the trigger filter or not. Default is 1.')
+opt.register('filterTrig', 0, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.bool, 'Flag indiciating to apply the trigger filter or not. Default is 0.')
 opt.parseArguments()
 
 
@@ -119,16 +119,18 @@ process.triggerStreamResultsFilter = cms.EDFilter('TriggerResultsFilter',
         'HLT_Mu17_v*',
     )
 )
-# count number of events
-process.eventCountPre = cms.EDAnalyzer('EventCounter')
-process.eventCountPost = cms.EDAnalyzer('EventCounter')
+## count number of events
+#process.eventCountPre = cms.EDAnalyzer('EventCounter')
+#process.eventCountPost = cms.EDAnalyzer('EventCounter')
 
 
 # Path and EndPath definitions
 if opt.filterTrig:
-    process.nanoAOD_step = cms.Path(process.eventCountPre * process.triggerStreamResultsFilter * process.nanoSequence * process.eventCountPost)
+    #process.nanoAOD_step = cms.Path(process.eventCountPre * process.triggerStreamResultsFilter * process.nanoSequence * process.eventCountPost)
+    process.nanoAOD_step = cms.Path(process.triggerStreamResultsFilter * process.nanoSequence)
 else:
-    process.nanoAOD_step = cms.Path(process.eventCountPre * process.nanoSequence * process.eventCountPost)
+    #process.nanoAOD_step = cms.Path(process.eventCountPre * process.nanoSequence * process.eventCountPost)
+    process.nanoAOD_step = cms.Path(process.nanoSequence)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.NANOAODoutput_step = cms.EndPath(process.NANOAODoutput)
 
@@ -157,7 +159,7 @@ else:
 # End of customisation functions
 
 # Customisation from command line
-process.TFileService = cms.Service("TFileService", fileName = cms.string(outputname.replace(".root", "_Count.root")) )
+#process.TFileService = cms.Service("TFileService", fileName = cms.string(outputname.replace(".root", "_Count.root")) )
 
 process.add_(cms.Service('InitRootHandlers', EnableIMT = cms.untracked.bool(False)))
 # Add early deletion of temporary data products to reduce peak memory need
