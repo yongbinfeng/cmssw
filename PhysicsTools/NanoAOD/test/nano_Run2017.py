@@ -39,10 +39,10 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         # test data
-        'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/00405246-A939-E811-A3F3-801844DEEC30.root'
+        #'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/00405246-A939-E811-A3F3-801844DEEC30.root'
         #'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/SingleMuon_H.root'
         # test MC
-        #'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/02036C45-98AC-E911-8DEC-1866DAEA79D0.root'
+        'file:/afs/cern.ch/work/y/yofeng/public/WpT/CMSSW_10_6_20/src/02036C45-98AC-E911-8DEC-1866DAEA79D0.root'
     ),
     secondaryFileNames = cms.untracked.vstring()
 )
@@ -147,7 +147,7 @@ process.options.numberOfStreams=cms.untracked.uint32(0)
 process.options.numberOfConcurrentLuminosityBlocks=cms.untracked.uint32(1)
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 5000
-process.MessageLogger.suppressWarning = cms.untracked.vstring('triggerStreamResultsFilter', 'genJetAK8FlavourAssociation')
+process.MessageLogger.suppressWarning = cms.untracked.vstring('triggerStreamResultsFilter', 'updatedPatJetsWithDeepInfo')
 
 # customisation of the process.
 
