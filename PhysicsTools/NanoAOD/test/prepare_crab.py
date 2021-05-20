@@ -11,9 +11,11 @@ samples = [
     (0, '/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-fixECALGT_LowPU_94X_mc2017_realistic_v10For2017H_v2_ext1-v1/MINIAODSIM', 2), # 169
     (0, '/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-fixECALGT_LowPU_94X_mc2017_realistic_v10For2017H_v2_ext1-v1/MINIAODSIM', 2), # 266
     (0, '/WJetsToLNu_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-fixECALGT_LowPU_94X_mc2017_realistic_v10For2017H_v2_ext1-v1/MINIAODSIM', 2), # 395
+    (0, '/WJetsToLNu_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-fixECALGT_LowPU_94X_mc2017_realistic_v10For2017H_v2_ext1-v1/MINIAODSIM', 2), # 79, in production
     (0, '/WJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIIFall17MiniAODv2-fixECALGT_LowPU_94X_mc2017_realistic_v10For2017H_v2-v1/MINIAODSIM', 2), # 26
     (0, '/WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-fixECALGT_LowPU_94X_mc2017_realistic_v10For2017H_v2_ext1-v1/MINIAODSIM', 2), # 6
     (0, '/WZTo3LNu_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODv2-fixECALGT_LowPU_94X_mc2017_realistic_v10For2017H_v2_ext1-v1/MINIAODSIM', 2), # 7
+    (0, '/ZZ_TuneCP5_13TeV-pythia8/RunIIFall17MiniAODv2-fixECALGT_LowPU_94X_mc2017_realistic_v10For2017H_v2_ext1-v1/MINIAODSIM', 2), # 9
     (1, '/HighEGJet/Run2017H-17Nov2017-v1/MINIAOD', 10), # 1070 files in total
     (1, '/SingleMuon/Run2017H-17Nov2017-v2/MINIAOD', 10), # 428 files in total
 ]
