@@ -26,14 +26,15 @@ process.TritonService.verbose = True
 # fallback server
 process.TritonService.fallback.verbose = False
 process.TritonService.fallback.useDocker = False
-process.TritonService.fallback.useGPU = True
-process.TritonService.servers.append(
-    cms.PSet(
-        name = cms.untracked.string("default"),
-        address = cms.untracked.string("0.0.0.0"),
-        port = cms.untracked.uint32(8001),
-    )
-)
+process.TritonService.fallback.useGPU = False # change to true is there is gpu available for the fall back server
+# uncomment this part if there is one server running at 0.0.0.0 with grpc port 8001
+#process.TritonService.servers.append(
+#    cms.PSet(
+#        name = cms.untracked.string("default"),
+#        address = cms.untracked.string("0.0.0.0"),
+#        port = cms.untracked.uint32(8001),
+#    )
+#)
 
 
 process.deepMETProducer = sonic_deepmet.clone(
