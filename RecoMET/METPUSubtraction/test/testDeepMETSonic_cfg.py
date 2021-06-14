@@ -17,7 +17,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
-                                'file:/storage/local/data1/home/yfeng/DeepMET/CMSSW_11_2_0_pre10_Patatrack/src/RecoMET/METPUSubtraction/test/9E5D0032-E9FB-6646-B1AB-67EA8B95FCCD.root'
+                                '/store/mc/RunIISummer20UL18MiniAOD/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/106X_upgrade2018_realistic_v11_L1v1-v1/260000/03794341-C401-CC45-B5FC-D11264E449CE.root'
                             ),
                             )
 
