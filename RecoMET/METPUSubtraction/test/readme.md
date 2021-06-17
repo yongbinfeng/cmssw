@@ -39,7 +39,7 @@ cd RecoMET/METPUSubtraction/test
 cmsRun testDeepMETSonic_cfg.py
 ```
 
-The configuration will run the local fallback sever with Singularity by default, if there is no server available.
+With the process modifier `enableSonicTriton` enabled, the configuration will run the local fallback sever with Singularity by default, if there is no server available.
 
 ## Instructions to make a new SONIC producer
 
