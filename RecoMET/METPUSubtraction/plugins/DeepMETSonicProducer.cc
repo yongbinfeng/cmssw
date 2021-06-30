@@ -12,14 +12,14 @@
 class DeepMETSonicProducer : public TritonEDProducer<> {
 public:
   explicit DeepMETSonicProducer(const edm::ParameterSet& cfg)
-    : TritonEDProducer<>(cfg, "DeepMETSonicProducer"),
-      pfName_(cfg.getParameter<edm::InputTag>("pf_src")),
-      pf_token_(consumes<std::vector<pat::PackedCandidate>>(pfName_)),
-      norm_(50.0),
-      ignore_leptons_(false),
-      max_n_pf_(4500),
-      px_leptons_(0),
-      py_leptons_(0) {
+      : TritonEDProducer<>(cfg, "DeepMETSonicProducer"),
+        pfName_(cfg.getParameter<edm::InputTag>("pf_src")),
+        pf_token_(consumes<std::vector<pat::PackedCandidate>>(pfName_)),
+        norm_(50.0),
+        ignore_leptons_(false),
+        max_n_pf_(4500),
+        px_leptons_(0),
+        py_leptons_(0) {
     produces<pat::METCollection>();
   }
   void acquire(edm::Event const& iEvent, edm::EventSetup const& iSetup, Input& iInput) override;
@@ -29,7 +29,7 @@ public:
 
 private:
   edm::InputTag pfName_;
-  const edm::EDGetTokenT<std::vector<pat::PackedCandidate> > pf_token_;
+  const edm::EDGetTokenT<std::vector<pat::PackedCandidate>> pf_token_;
   const float norm_;
   const bool ignore_leptons_;
   const unsigned int max_n_pf_;
@@ -42,12 +42,11 @@ private:
 };
 
 float DeepMETSonicProducer::scale_and_rm_outlier(float val, float scale) {
-    float ret_val = val * scale;
-    if (ret_val > 1e6 || ret_val < -1e6)
-      return 0.;
-    return ret_val;
+  float ret_val = val * scale;
+  if (ret_val > 1e6 || ret_val < -1e6)
+    return 0.;
+  return ret_val;
 }
-
 
 void DeepMETSonicProducer::acquire(edm::Event const& iEvent, edm::EventSetup const& iSetup, Input& iInput) {
   // one event per batch
@@ -79,7 +78,7 @@ void DeepMETSonicProducer::acquire(edm::Event const& iEvent, edm::EventSetup con
   vpffromPV.reserve(input_cat2.sizeShape());
 
   size_t i_pf = 0;
-  for (const auto& pf: pfs) {
+  for (const auto& pf : pfs) {
     if (ignore_leptons_) {
       int pdg_id = std::abs(pf.pdgId());
       if (pdg_id == 11 || pdg_id == 13) {
@@ -90,32 +89,31 @@ void DeepMETSonicProducer::acquire(edm::Event const& iEvent, edm::EventSetup con
     }
 
     // PF keys [b'PF_dxy', b'PF_dz', b'PF_eta', b'PF_mass', b'PF_pt', b'PF_puppiWeight', b'PF_px', b'PF_py']
-    vpfdata.push_back( pf.dxy() );
-    vpfdata.push_back( pf.dz() );
-    vpfdata.push_back( pf.eta() );
-    vpfdata.push_back( pf.mass() );
-    vpfdata.push_back( scale_and_rm_outlier(pf.pt(), scale) );
-    vpfdata.push_back( pf.puppiWeight() );
-    vpfdata.push_back( scale_and_rm_outlier(pf.px(), scale) );
-    vpfdata.push_back( scale_and_rm_outlier(pf.py(), scale) );
+    vpfdata.push_back(pf.dxy());
+    vpfdata.push_back(pf.dz());
+    vpfdata.push_back(pf.eta());
+    vpfdata.push_back(pf.mass());
+    vpfdata.push_back(scale_and_rm_outlier(pf.pt(), scale));
+    vpfdata.push_back(pf.puppiWeight());
+    vpfdata.push_back(scale_and_rm_outlier(pf.px(), scale));
+    vpfdata.push_back(scale_and_rm_outlier(pf.py(), scale));
 
-    vpfchg.push_back( charge_embedding_.at(pf.charge()) );
+    vpfchg.push_back(charge_embedding_.at(pf.charge()));
 
     vpfpdgId.push_back(pdg_id_embedding_.at(pf.pdgId()));
 
-    vpffromPV.push_back( pf.fromPV() );
+    vpffromPV.push_back(pf.fromPV());
 
     ++i_pf;
     if (i_pf == max_n_pf_) {
       break;  // output a warning?
     }
-
   }
 
   // fill the remaining with zeros
-  while(i_pf < 4500){
-    for (int i=0; i<8; i++) {
-        vpfdata.push_back(0.);
+  while (i_pf < 4500) {
+    for (int i = 0; i < 8; i++) {
+      vpfdata.push_back(0.);
     }
     vpfchg.push_back(0);
     vpfpdgId.push_back(0);
