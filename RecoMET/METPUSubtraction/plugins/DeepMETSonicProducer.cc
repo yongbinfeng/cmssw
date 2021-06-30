@@ -15,7 +15,6 @@ public:
     : TritonEDProducer<>(cfg, "DeepMETSonicProducer"),
       pfName_(cfg.getParameter<edm::InputTag>("pf_src")),
       pf_token_(consumes<std::vector<pat::PackedCandidate>>(pfName_)),
-      batchSize_(cfg.getParameter<unsigned>("batchSize")),
       norm_(50.0),
       ignore_leptons_(false),
       max_n_pf_(4500),
@@ -31,7 +30,6 @@ public:
 private:
   edm::InputTag pfName_;
   const edm::EDGetTokenT<std::vector<pat::PackedCandidate> > pf_token_;
-  unsigned batchSize_;
   const float norm_;
   const bool ignore_leptons_;
   const unsigned int max_n_pf_;
@@ -52,8 +50,8 @@ float DeepMETSonicProducer::scale_and_rm_outlier(float val, float scale) {
 
 
 void DeepMETSonicProducer::acquire(edm::Event const& iEvent, edm::EventSetup const& iSetup, Input& iInput) {
-  //std::cout << "start running acquiring " << std::endl;
-  client_->setBatchSize(batchSize_);
+  // one event per batch
+  client_->setBatchSize(1);
   px_leptons_ = 0.;
   py_leptons_ = 0.;
   const float scale = 1. / norm_;
@@ -132,35 +130,19 @@ void DeepMETSonicProducer::acquire(edm::Event const& iEvent, edm::EventSetup con
 }
 
 void DeepMETSonicProducer::produce(edm::Event& iEvent, edm::EventSetup const& iSetup, Output const& iOutput) {
-  //std::cout << "run produce" << std::endl;
   const auto& output1 = iOutput.begin()->second;
   const auto& outputs = output1.fromServer<float>();
 
-  auto dim = output1.sizeDims();
-  //std::cout <<"dim " << dim << std::endl;
-  //std::cout << outputs[0][0]  << " 2 " << outputs[0][1] << std::endl;
-
-  //for (int i = 0; i < output1.shape()[0]; ++i) {
-  //  std::cout << "output " << i << " : ";
-  //  for (int j = 0; j < output1.shape()[1]; ++j) {
-  //    std::cout << outputs[0][output1.shape()[1] * i + j] << " ";
-  //  }
-  //  std::cout << std::endl;
-  //}
-
+  // outputs are px and py
   float px = outputs[0][0] * norm_;
   float py = outputs[0][1] * norm_;
 
+  // subtract the lepton pt contribution
   px -= px_leptons_;
   py -= py_leptons_;
 
-  //std::cout << outputs[0][0]  << " 2 " << outputs[0][1] << std::endl;
-  //std::cout << outputs[0][0]*norm_  << " 2 " << outputs[0][1]*norm_ << std::endl;
-  //std::cout << "px " << px << " py " << py << std::endl;
-
   auto pf_mets = std::make_unique<pat::METCollection>();
   const reco::Candidate::LorentzVector p4(px, py, 0., std::hypot(px, py));
-  //const reco::Candidate::LorentzVector p4(0., 0., 0., std::hypot(0., 0.));
   pf_mets->emplace_back(reco::MET(p4, {}));
   iEvent.put(std::move(pf_mets));
 }
