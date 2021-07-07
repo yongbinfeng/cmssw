@@ -46,9 +46,10 @@ def processDeepProducer(process, producer_name):
 
 
 import FWCore.ParameterSet.Config as cms
+from Configuration.ProcessModifiers.enableSonicTriton_cff import enableSonicTriton
 from RecoTauTag.RecoTau.deeptauIdSonicProducer_cff import sonic_deeptau
 
-process = cms.Process('DeepTau')
+process = cms.Process('DeepTau', enableSonicTriton)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -101,3 +102,69 @@ process.options = cms.untracked.PSet(
     numberOfStreams = cms.untracked.uint32( 0 ),
     #sizeOfStackForThreadsInKB = cms.untracked.uint32( 10*1024 )
 )
+
+process.FastTimerService = cms.Service( "FastTimerService",
+    dqmPath = cms.untracked.string( "HLT/TimerService" ),
+    dqmModuleTimeRange = cms.untracked.double( 40.0 ),
+    enableDQMbyPath = cms.untracked.bool( True ),
+    writeJSONSummary = cms.untracked.bool( True ),
+    dqmPathMemoryResolution = cms.untracked.double( 5000.0 ),
+    enableDQM = cms.untracked.bool( True ),
+    enableDQMbyModule = cms.untracked.bool( True ),
+    dqmModuleMemoryRange = cms.untracked.double( 100000.0 ),
+    dqmModuleMemoryResolution = cms.untracked.double( 500.0 ),
+    dqmMemoryResolution = cms.untracked.double( 5000.0 ),
+    enableDQMbyLumiSection = cms.untracked.bool( True ),
+    dqmPathTimeResolution = cms.untracked.double( 0.5 ),
+    printEventSummary = cms.untracked.bool( False ),
+    dqmPathTimeRange = cms.untracked.double( 100.0 ),
+    dqmTimeRange = cms.untracked.double( 2000.0 ),
+    enableDQMTransitions = cms.untracked.bool( False ),
+    dqmPathMemoryRange = cms.untracked.double( 1000000.0 ),
+    dqmLumiSectionsRange = cms.untracked.uint32( 2500 ),
+    enableDQMbyProcesses = cms.untracked.bool( True ),
+    dqmMemoryRange = cms.untracked.double( 1000000.0 ),
+    dqmTimeResolution = cms.untracked.double( 5.0 ),
+    printRunSummary = cms.untracked.bool( False ),
+    dqmModuleTimeResolution = cms.untracked.double( 0.2 ),
+    printJobSummary = cms.untracked.bool( True ),
+    jsonFileName = cms.untracked.string( "result_sonic.json" )
+)
+
+process.ThroughputService = cms.Service( "ThroughputService",
+    dqmPath = cms.untracked.string( "HLT/Throughput" ),
+    eventRange = cms.untracked.uint32( 10000 ),
+    timeRange = cms.untracked.double( 60000.0 ),
+    printEventSummary = cms.untracked.bool( True ),
+    eventResolution = cms.untracked.uint32( 100 ),
+    enableDQM = cms.untracked.bool( True ),
+    dqmPathByProcesses = cms.untracked.bool( True ),
+    timeResolution = cms.untracked.double( 5.828 )
+)
+
+##
+process.load('FWCore.MessageLogger.MessageLogger_cfi')
+if process.maxEvents.input.value()>10:
+     process.MessageLogger.cerr.FwkReport.reportEvery = process.maxEvents.input.value()//10
+if process.maxEvents.input.value()>2000 or process.maxEvents.input.value()<0:
+     process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.ThroughputService = cms.untracked.PSet(
+    limit = cms.untracked.int32(10000000),
+    reportEvery = cms.untracked.int32(1)
+)
+process.MessageLogger.cerr.TritonClient = cms.untracked.PSet(
+    limit = cms.untracked.int32(100000000),
+)
+process.MessageLogger.cerr.TritonService = cms.untracked.PSet(
+    limit = cms.untracked.int32(100000000),
+)
+process.MessageLogger.cerr.deepTauProducer = cms.untracked.PSet(
+    limit = cms.untracked.int32(100000000),
+)
+setattr(process.MessageLogger.cerr, "deepTauProducer:TritonClient",
+    cms.untracked.PSet(
+    limit = cms.untracked.int32(100000000),
+    )
+)
+
+
