@@ -58,24 +58,20 @@ void DeepMETSonicProducer::acquire(edm::Event const& iEvent, edm::EventSetup con
   auto const& pfs = iEvent.get(pf_token_);
 
   auto& input = iInput.at("input");
-  auto pfdata = std::make_shared<TritonInput<float>>(1);
+  auto pfdata = input.allocate<float>();
   auto& vpfdata = (*pfdata)[0];
-  vpfdata.reserve(input.sizeShape());
 
   auto& input_cat0 = iInput.at("input_cat0");
-  auto pfchg = std::make_shared<TritonInput<float>>(1);
+  auto pfchg = input_cat0.allocate<float>();
   auto& vpfchg = (*pfchg)[0];
-  vpfchg.reserve(input_cat0.sizeShape());
 
   auto& input_cat1 = iInput.at("input_cat1");
-  auto pfpdgId = std::make_shared<TritonInput<float>>(1);
+  auto pfpdgId = input_cat1.allocate<float>();
   auto& vpfpdgId = (*pfpdgId)[0];
-  vpfpdgId.reserve(input_cat1.sizeShape());
 
   auto& input_cat2 = iInput.at("input_cat2");
-  auto pffromPV = std::make_shared<TritonInput<float>>(1);
+  auto pffromPV = input_cat2.allocate<float>();
   auto& vpffromPV = (*pffromPV)[0];
-  vpffromPV.reserve(input_cat2.sizeShape());
 
   size_t i_pf = 0;
   for (const auto& pf : pfs) {
