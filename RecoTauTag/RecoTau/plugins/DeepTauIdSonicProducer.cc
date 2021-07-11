@@ -426,8 +426,8 @@ void DeepTauIdSonicProducer::acquire(edm::Event const& iEvent, edm::EventSetup c
   for (size_t tau_index = 0; tau_index < taus->size(); ++tau_index) {
     const edm::RefToBase<reco::BaseTau> tauRef = taus->refAt(tau_index);
     bool passesPrediscriminants = true;
-    passesPrediscriminants = tauIDs.passPrediscriminants<std::vector<PATTauDiscInfo>>(
-        patPrediscriminants_, andPrediscriminants_, tauRef);
+    passesPrediscriminants =
+        tauIDs.passPrediscriminants<std::vector<PATTauDiscInfo>>(patPrediscriminants_, andPrediscriminants_, tauRef);
     if (!passesPrediscriminants)
       continue;
 
@@ -627,7 +627,7 @@ void DeepTauIdSonicProducer::produce(edm::Event& iEvent, edm::EventSetup const& 
     int tau_index = tau_indices_[itau_passed];
     std::copy(outputs_tauval[0].begin() + deep_tau::NumberOfOutputs * itau_passed,
               outputs_tauval[0].begin() + deep_tau::NumberOfOutputs * (itau_passed + 1),
-              pred_all[tau_index].begin() );
+              pred_all[tau_index].begin());
   }
 
   createOutputs(iEvent, pred_all, taus);

@@ -56,7 +56,9 @@ namespace deep_tau {
     return pred.matrix<float>()(tau_index, elem);
   }
 
-  float DeepTauBase::Output::get_number(const std::vector<std::vector<float>>& pred, size_t tau_index, size_t elem) const {
+  float DeepTauBase::Output::get_number(const std::vector<std::vector<float>>& pred,
+                                        size_t tau_index,
+                                        size_t elem) const {
     return pred.at(tau_index).at(elem);
   }
 
