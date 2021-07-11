@@ -19,8 +19,8 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
                             secondaryFileNames=cms.untracked.vstring(),
                             fileNames=cms.untracked.vstring(
-                                '/store/relval/CMSSW_11_0_0_pre7/RelValTTbar_13/MINIAODSIM/PUpmx25ns_110X_mc2017_realistic_v1_rsb-v1/10000/A745F01B-D6C3-A843-97B7-2B12C7C0DD4E.root'
-                            ),
+                                # '/store/relval/CMSSW_11_0_0_pre7/RelValTTbar_13/MINIAODSIM/PUpmx25ns_110X_mc2017_realistic_v1_rsb-v1/10000/A745F01B-D6C3-A843-97B7-2B12C7C0DD4E.root'),
+                                '/store/mc/RunIIAutumn18MiniAOD/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/270000/9E5D0032-E9FB-6646-B1AB-67EA8B95FCCD.root'),
                             skipEvents=cms.untracked.uint32(0)
                             )
 
