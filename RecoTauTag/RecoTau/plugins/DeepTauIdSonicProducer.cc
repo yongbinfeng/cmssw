@@ -106,7 +106,7 @@ public:
       const edm::InputTag& label = iPredisc.getParameter<edm::InputTag>("Producer");
       double cut = iPredisc.getParameter<double>("cut");
 
-      TauDiscInfo<pat::PATTauDiscriminator> thisDiscriminator;
+      PATTauDiscInfo thisDiscriminator;
       thisDiscriminator.label = label;
       thisDiscriminator.cut = cut;
       thisDiscriminator.disc_token = consumes<pat::PATTauDiscriminator>(label);
@@ -114,32 +114,24 @@ public:
     }
   }
 
-  using TauDiscriminator = reco::TauDiscriminatorContainer;
-  using TauCollection = edm::View<reco::BaseTau>;
+  using TauDiscriminator = deep_tau::DeepTauBase::TauDiscriminator;
+  using TauCollection = deep_tau::DeepTauBase::TauCollection;
+  using CandidateCollection = deep_tau::DeepTauBase::CandidateCollection;
+  using TauRef = deep_tau::DeepTauBase::TauRef;
+  using TauRefProd = deep_tau::DeepTauBase::TauRefProd;
+  using ElectronCollection = deep_tau::DeepTauBase::ElectronCollection;
+  using MuonCollection = deep_tau::DeepTauBase::MuonCollection;
+  using Cutter = deep_tau::TauWPThreshold;
+  using CutterPtr = deep_tau::DeepTauBase::CutterPtr;
+  using WPList = deep_tau::DeepTauBase::WPList;
+  using BasicDiscriminator = deep_tau::DeepTauBase::BasicDiscriminator;
+  using PATTauDiscInfo = deep_tau::DeepTauBase::TauDiscInfo<pat::PATTauDiscriminator>;
+
   void acquire(edm::Event const& iEvent, edm::EventSetup const& iSetup, Input& iInput) override;
   void produce(edm::Event& iEvent, edm::EventSetup const& iSetup, Output const& iOutput) override;
   void createOutputs(edm::Event& event, const std::vector<float>& pred, edm::Handle<TauCollection> taus);
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
   float scale_and_rm_outlier(float val, float scale);
-  using CandidateCollection = edm::View<reco::Candidate>;
-  using TauRef = edm::Ref<TauCollection>;
-  using TauRefProd = edm::RefProd<TauCollection>;
-  using ElectronCollection = pat::ElectronCollection;
-  using MuonCollection = pat::MuonCollection;
-
-  using Cutter = deep_tau::TauWPThreshold;
-  using CutterPtr = std::unique_ptr<Cutter>;
-  using WPList = std::vector<CutterPtr>;
-  using BasicDiscriminator = deep_tau::DeepTauBase::BasicDiscriminator;
-
-  template <typename ConsumeType>
-  struct TauDiscInfo {
-    edm::InputTag label;
-    edm::Handle<ConsumeType> handle;
-    edm::EDGetTokenT<ConsumeType> disc_token;
-    double cut;
-    void fill(const edm::Event& evt) { evt.getByToken(disc_token, handle); }
-  };
 
   struct OutputDisc {
     std::vector<size_t> num_, den_;
@@ -185,7 +177,7 @@ public:
 
   // select boolean operation on prediscriminants (and = 0x01, or = 0x00)
   uint8_t andPrediscriminants_;
-  std::vector<TauDiscInfo<pat::PATTauDiscriminator>> patPrediscriminants_;
+  std::vector<PATTauDiscInfo> patPrediscriminants_;
 
   static const OutputDiscCollection& GetOutputDiscs() {
     static constexpr size_t e_index = 0, mu_index = 1, tau_index = 2, jet_index = 3;
@@ -473,7 +465,7 @@ void DeepTauIdSonicProducer::acquire(edm::Event const& iEvent, edm::EventSetup c
   for (size_t tau_index = 0; tau_index < taus->size(); ++tau_index) {
     const edm::RefToBase<reco::BaseTau> tauRef = taus->refAt(tau_index);
     bool passesPrediscriminants = true;
-    passesPrediscriminants = tauIDs.passPrediscriminants<std::vector<TauDiscInfo<pat::PATTauDiscriminator>>>(
+    passesPrediscriminants = tauIDs.passPrediscriminants<std::vector<PATTauDiscInfo>>(
         patPrediscriminants_, andPrediscriminants_, tauRef);
     if (!passesPrediscriminants)
       continue;
