@@ -126,52 +126,13 @@ public:
   using WPList = deep_tau::DeepTauBase::WPList;
   using BasicDiscriminator = deep_tau::DeepTauBase::BasicDiscriminator;
   using PATTauDiscInfo = deep_tau::DeepTauBase::TauDiscInfo<pat::PATTauDiscriminator>;
+  using OutputDisc = deep_tau::DeepTauBase::Output;
 
   void acquire(edm::Event const& iEvent, edm::EventSetup const& iSetup, Input& iInput) override;
   void produce(edm::Event& iEvent, edm::EventSetup const& iSetup, Output const& iOutput) override;
-  void createOutputs(edm::Event& event, const std::vector<float>& pred, edm::Handle<TauCollection> taus);
+  void createOutputs(edm::Event& event, const std::vector<std::vector<float>>& pred, edm::Handle<TauCollection> taus);
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
   float scale_and_rm_outlier(float val, float scale);
-
-  struct OutputDisc {
-    std::vector<size_t> num_, den_;
-
-    OutputDisc(const std::vector<size_t>& num, const std::vector<size_t>& den) : num_(num), den_(den) {}
-
-    std::unique_ptr<TauDiscriminator> get_value(const edm::Handle<TauCollection>& taus,
-                                                const std::vector<float>& pred,
-                                                const WPList* working_points,
-                                                bool is_online = false) const {
-      std::vector<reco::SingleTauDiscriminatorContainer> outputbuffer(taus->size());
-
-      for (size_t tau_index = 0; tau_index < taus->size(); ++tau_index) {
-        float x = 0;
-        for (size_t num_elem : num_)
-          //x += pred.matrix<float>()(tau_index, num_elem);
-          // pred is a 1d vector
-          x += pred[tau_index * 4 + num_elem];
-        if (x != 0 && !den_.empty()) {
-          float den_val = 0;
-          for (size_t den_elem : den_)
-            //den_val += pred.matrix<float>()(tau_index, den_elem);
-            den_val += pred[tau_index * 4 + den_elem];
-          x = den_val != 0 ? x / den_val : std::numeric_limits<float>::max();
-        }
-        outputbuffer[tau_index].rawValues.push_back(x);
-        if (working_points) {
-          for (const auto& wp : *working_points) {
-            const bool pass = x > (*wp)(taus->at(tau_index), is_online);
-            outputbuffer[tau_index].workingPoints.push_back(pass);
-          }
-        }
-      }
-      std::unique_ptr<TauDiscriminator> output = std::make_unique<TauDiscriminator>();
-      reco::TauDiscriminatorContainer::Filler filler(*output);
-      filler.insert(taus, outputbuffer.begin(), outputbuffer.end());
-      filler.fill();
-      return output;
-    }
-  };
 
   using OutputDiscCollection = std::map<std::string, OutputDisc>;
 
@@ -661,27 +622,26 @@ void DeepTauIdSonicProducer::produce(edm::Event& iEvent, edm::EventSetup const& 
 
   // fill the taus passing the selections with the results from produce,
   //  and the taus failing the selections with zero
-  std::vector<float> pred_all(taus->size() * deep_tau::NumberOfOutputs, 0.);
+  std::vector<std::vector<float>> pred_all(taus->size(), std::vector<float>(deep_tau::NumberOfOutputs, 0.));
   for (unsigned itau_passed = 0; itau_passed < tau_indices_.size(); ++itau_passed) {
     int tau_index = tau_indices_[itau_passed];
-    int nelem = deep_tau::NumberOfOutputs;
-    std::copy(outputs_tauval[0].begin() + nelem * itau_passed,
-              outputs_tauval[0].begin() + nelem * (itau_passed + 1),
-              pred_all.begin() + nelem * tau_index);
+    std::copy(outputs_tauval[0].begin() + deep_tau::NumberOfOutputs * itau_passed,
+              outputs_tauval[0].begin() + deep_tau::NumberOfOutputs * (itau_passed + 1),
+              pred_all[tau_index].begin() );
   }
 
   createOutputs(iEvent, pred_all, taus);
 }
 
 void DeepTauIdSonicProducer::createOutputs(edm::Event& event,
-                                           const std::vector<float>& pred,
+                                           const std::vector<std::vector<float>>& pred,
                                            edm::Handle<TauCollection> taus) {
   for (const auto& output_desc : outputdiscs_) {
     const WPList* working_points = nullptr;
     if (workingPoints_.find(output_desc.first) != workingPoints_.end()) {
       working_points = &workingPoints_.at(output_desc.first);
     }
-    auto result = output_desc.second.get_value(taus, pred, working_points);
+    auto result = output_desc.second.get_value(taus, pred, working_points, false);
     event.put(std::move(result), output_desc.first);
   }
 }
