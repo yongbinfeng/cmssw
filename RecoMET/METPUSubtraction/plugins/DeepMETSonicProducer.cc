@@ -144,7 +144,6 @@ void DeepMETSonicProducer::produce(edm::Event& iEvent, edm::EventSetup const& iS
 void DeepMETSonicProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   TritonClient::fillPSetDescription(desc);
-  desc.add<unsigned>("batchSize", 1);
   desc.add<edm::InputTag>("pf_src");
   descriptions.add("deepMETSonicProducer", desc);
 }
